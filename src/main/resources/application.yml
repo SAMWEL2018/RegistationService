@@ -1,0 +1,56 @@
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  retry:
+    instances:
+      registerService:
+        max-attempts: 3
+        waitDuration: 5s
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_SERVER_HOST_IP:localhost}:8012/eureka/
+
+server:
+  port: ${SERVER_PORT:8011}
+spring:
+  application:
+    name: RegisterService
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+  datasource:
+    password: ${DB_PASSWORD:root}
+    username: ${DB_USERNAME:postgres}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:metropol_users}
+
+app:
+  check_loan_balance_service_url: ${CHECK_LOAN_BALANCE_SERVICE_URL:http://localhost:8012/initializeLoanLimitAccount}
+
+
+logging:
+  pattern:
+    dateformat: 'yyyy-MM-dd HH:mm:ss.SSS XXX'
+  level:
+    root: INFO
+    com:
+      example.registerservice: DEBUG
+  file:
+    name: ${LOG_PATH:/registerservice/logs/}${LOGFILE:today.log}
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${LOG_PATH:/registerservice/logs/}%d{ddMMyyyy}.%i.log
+      max-history: 60
+      max-file-size: 800MB
